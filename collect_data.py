@@ -6,6 +6,7 @@
 """
 import requests
 import json
+import copy
 
 from config import FORMAT, POKEMON_SHOWDOWN
 
@@ -41,15 +42,27 @@ def formatUrlArgs(base_url: str, args: dict) -> str:
     args_str = "?" + args_str[1:]
     return base_url + args_str
 
-def getMostRecentMatchesFormat(format: str = None):
+def getMostRecentMatchesFormat(format: str = None, args=None) -> list:
+    """Return a JSON formatted list of matches by format """
     if format is None:
         format = FORMAT
+    if args is None:
+        args = {}
 
-    url = formatUrlArgs(base_url=POKEMON_SHOWDOWN, args={"format": format})
+    args = copy.deepcopy(args)
+    args.update({"format": format})
+
+    url = formatUrlArgs(base_url=POKEMON_SHOWDOWN, args=args)
     return apiCall(url=url)
+
+def saveReplay():
+    j = apiCall("https://replay.pokemonshowdown.com/gen9vgc2023series2-1829661013.json")
+    with open("klfsf.txt", "w+") as f:
+        json.dump(j, f, indent=4)
+    print(j["log"])
 
 
 if __name__ == '__main__':
     result = getMostRecentMatchesFormat()
-    print(result)
+    saveReplay()
     
